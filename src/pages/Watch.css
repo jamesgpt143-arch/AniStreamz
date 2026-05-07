@@ -1,0 +1,293 @@
+.watch-page {
+  padding-bottom: 4rem;
+}
+
+.back-link {
+  display: inline-flex;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: var(--text);
+}
+
+.watch-content {
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .watch-content {
+    flex-direction: row;
+  }
+}
+
+.player-section {
+  flex-grow: 1;
+  max-width: 100%;
+}
+
+.sidebar-section {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .sidebar-section {
+    width: 350px;
+    flex-shrink: 0;
+  }
+}
+
+.sidebar-episodes {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Custom Scrollbar for sidebar */
+.sidebar-episodes::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-episodes::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+.sidebar-episodes::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+/* Recommendations Section */
+.recommendations-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 2.5rem;
+}
+
+.recommendations-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  text-transform: uppercase;
+  border-left: 4px solid var(--primary);
+  padding-left: 0.75rem;
+}
+
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .recommendations-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .recommendations-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.recommendation-card-wrapper {
+  text-decoration: none;
+  display: block;
+}
+
+.recommendation-card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary);
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.2);
+}
+
+.rec-img-wrapper {
+  position: relative;
+  aspect-ratio: 2/3;
+  width: 100%;
+  overflow: hidden;
+}
+
+.rec-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.recommendation-card:hover .rec-img {
+  transform: scale(1.08);
+}
+
+.rec-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.recommendation-card:hover .rec-overlay {
+  opacity: 1;
+}
+
+.rec-play-btn {
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.recommendation-card:hover .rec-play-btn {
+  transform: translateY(0);
+}
+
+.rec-title {
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+
+/* Recommendation Badge styles */
+.rec-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  color: white;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.375rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.rec-badge.badge-relation {
+  background: linear-gradient(135deg, var(--primary) 0%, #a78bfa 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.rec-badge.badge-genre {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.recommendation-card:hover .rec-badge {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
+}
+
+/* ==========================================================================
+   Autoplay Overlay Styles
+   ========================================================================== */
+
+.relative-player-container {
+  overflow: hidden;
+  border-radius: 0.75rem;
+}
+
+.autoplay-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: dropdownSlideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.autoplay-card {
+  max-width: 340px;
+  width: 90%;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(139, 92, 246, 0.15) !important;
+  text-align: center;
+  border-radius: 1rem;
+  padding: 2rem !important;
+}
+
+.countdown-ring-wrapper {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.countdown-ring {
+  transform: rotate(-90deg); /* Start animation from 12 o'clock */
+}
+
+.countdown-ring-progress {
+  transition: stroke-dashoffset 1s linear;
+}
+
+.countdown-number {
+  position: absolute;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text);
+  animation: pulseNumber 1s ease-in-out infinite;
+}
+
+@keyframes pulseNumber {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    text-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+  }
+}
+
+.autoplay-trigger {
+  background: rgba(139, 92, 246, 0.05) !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  color: #c084fc !important;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.autoplay-trigger:hover {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.25) !important;
+  transform: translateY(-1px);
+}

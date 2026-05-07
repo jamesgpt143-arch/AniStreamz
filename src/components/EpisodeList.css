@@ -1,0 +1,58 @@
+.episode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.episode-card {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.episode-card:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.ep-number {
+  width: 3rem;
+  height: 3rem;
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary);
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.ep-info {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.ep-title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ep-jp {
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ep-play {
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.episode-card:hover .ep-play {
+  opacity: 1;
+  transform: scale(1.1);
+}
