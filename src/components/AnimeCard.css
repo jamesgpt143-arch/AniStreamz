@@ -93,28 +93,28 @@
   font-size: 0.875rem;
 }
 
-/* Premium Mobile Enhancements for 3-Column Grid */
+/* Premium Mobile Enhancements for 2-Column Grid */
 @media (max-width: 640px) {
   .anime-card {
-    gap: 0.4rem;
+    gap: 0.6rem;
   }
   .card-info .title {
-    font-size: 0.75rem; /* Slightly smaller text for 3-col fit */
-    line-height: 1.25;
-    margin-bottom: 0.15rem;
+    font-size: 0.875rem; /* Premium larger text since cards are wider in 2-col layout */
+    line-height: 1.35;
+    margin-bottom: 0.25rem;
   }
   .card-info .subtitle {
-    font-size: 0.65rem; /* Sized down subtitle info */
+    font-size: 0.75rem; /* Highly readable subtitle info */
   }
   .badges {
-    top: 0.35rem;
-    left: 0.35rem;
-    right: 0.35rem;
+    top: 0.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
   }
   .badge {
-    font-size: 0.6rem; /* Smaller badges for mobile */
-    padding: 0.15rem 0.35rem;
-    border-radius: 0.2rem;
+    font-size: 0.65rem; /* Optimized badges for mobile */
+    padding: 0.2rem 0.45rem;
+    border-radius: 0.25rem;
   }
   .play-icon {
     display: none; /* Hide hover play icon on touch screens to simplify UI */

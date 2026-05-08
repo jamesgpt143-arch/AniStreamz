@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Settings, ArrowUp, Loader2, AlertCircle, Home } from 'lucide-react';
+import { fetchMangaDex } from '../utils/mangaApi';
 import './MangaReader.css';
 
 export default function MangaReader() {
@@ -25,20 +26,22 @@ export default function MangaReader() {
   const [showControls, setShowControls] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  // Auto-hide toolbar gestures on scroll down
+  // Auto-hide toolbar gestures on scroll down (highly optimized for 120fps mobile momentum scrolling)
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 120) {
-        setShowControls(false); // hide on scroll down
-      } else {
-        setShowControls(true);  // show on scroll up
+      const goingDown = currentScrollY > lastScrollY && currentScrollY > 120;
+      
+      if (goingDown && showControls) {
+        setShowControls(false);
+      } else if (!goingDown && !showControls) {
+        setShowControls(true);
       }
       setLastScrollY(currentScrollY);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, [lastScrollY, showControls]);
 
   // Load Chapter pages and parent details
   useEffect(() => {
@@ -47,7 +50,7 @@ export default function MangaReader() {
       setError(null);
       try {
         // 1. Fetch current chapter meta and discover parent manga
-        const chapRes = await fetch(`https://api.mangadex.org/chapter/${chapterId}?includes[]=manga`);
+        const chapRes = await fetchMangaDex(`chapter/${chapterId}?includes[]=manga`);
         const chapData = await chapRes.json();
         
         if (!chapData.data) {
@@ -77,7 +80,7 @@ export default function MangaReader() {
         );
 
         // 2. Fetch CDN pages server
-        const serverRes = await fetch(`https://api.mangadex.org/at-home/server/${chapterId}`);
+        const serverRes = await fetchMangaDex(`at-home/server/${chapterId}`);
         const serverData = await serverRes.json();
         
         if (serverData.result !== 'ok' || !serverData.chapter) {
@@ -94,8 +97,8 @@ export default function MangaReader() {
         });
 
         // 3. Load entire chapters list of the manga to support next/prev selectors
-        const feedRes = await fetch(
-          `https://api.mangadex.org/manga/${parentMangaId}/feed?translatedLanguage[]=en&order[chapter]=asc&limit=500&contentRating[]=safe&contentRating[]=suggestive`
+        const feedRes = await fetchMangaDex(
+          `manga/${parentMangaId}/feed?translatedLanguage[]=en&order[chapter]=asc&limit=500&contentRating[]=safe&contentRating[]=suggestive`
         );
         const feedData = await feedRes.json();
 

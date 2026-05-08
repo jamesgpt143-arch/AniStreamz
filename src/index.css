@@ -128,8 +128,8 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 640px) {
   .anime-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem; /* Smaller gaps on mobile to fit 3 columns beautifully */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem; /* Premium larger gaps on mobile for clean 2-column grid */
   }
 }
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Play, Search, Home as HomeIcon, Compass, Heart, BookOpen } from 'lucide-react';
+import { fetchMangaDex } from '../utils/mangaApi';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -32,7 +33,7 @@ export default function Navbar() {
       setIsSearching(true);
       try {
         if (currentPath.startsWith('/manga')) {
-          const res = await fetch(`https://api.mangadex.org/manga?limit=5&title=${encodeURIComponent(searchQuery)}&includes[]=cover_art`);
+          const res = await fetchMangaDex(`manga?limit=5&title=${encodeURIComponent(searchQuery)}&includes[]=cover_art`);
           const data = await res.json();
           const mapped = (data.data || []).map(manga => {
             const coverRel = manga.relationships?.find(r => r.type === 'cover_art');

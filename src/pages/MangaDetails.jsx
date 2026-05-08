@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Star, BookOpen, Clock, Tag, ArrowUpDown, Search, Loader2, AlertCircle } from 'lucide-react';
+import { fetchMangaDex } from '../utils/mangaApi';
 import './MangaDetails.css';
 
 export default function MangaDetails() {
@@ -36,8 +37,8 @@ export default function MangaDetails() {
       setError(null);
       try {
         // 1. Fetch Manga Metadata
-        const metaRes = await fetch(
-          `https://api.mangadex.org/manga/${id}?includes[]=cover_art&includes[]=author`
+        const metaRes = await fetchMangaDex(
+          `manga/${id}?includes[]=cover_art&includes[]=author`
         );
         const metaData = await metaRes.json();
         
@@ -66,8 +67,8 @@ export default function MangaDetails() {
         setManga(mangaMeta);
 
         // 2. Fetch Chapters Feed (limit to 500 English chapters)
-        const feedRes = await fetch(
-          `https://api.mangadex.org/manga/${id}/feed?translatedLanguage[]=en&order[chapter]=asc&limit=500&contentRating[]=safe&contentRating[]=suggestive`
+        const feedRes = await fetchMangaDex(
+          `manga/${id}/feed?translatedLanguage[]=en&order[chapter]=asc&limit=500&contentRating[]=safe&contentRating[]=suggestive`
         );
         const feedData = await feedRes.json();
 

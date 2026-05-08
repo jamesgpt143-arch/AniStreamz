@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { BookOpen, Star, AlertCircle, Loader2 } from 'lucide-react';
 import MangaCard from '../components/MangaCard';
+import { fetchMangaDex } from '../utils/mangaApi';
 import './Manga.css';
 
 const FEATURED_POOL = [
@@ -15,13 +16,19 @@ export default function Manga() {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('q');
 
+  // Home Screen Content State
   const [featured, setFeatured] = useState(null);
   const [trending, setTrending] = useState([]);
   const [latest, setLatest] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  
   const [loading, setLoading] = useState(true);
+  
+  // Search Results & Pagination State
+  const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   const [error, setError] = useState(null);
 
   // Helper to extract cover URL from Manga relationship array
@@ -39,114 +46,142 @@ export default function Manga() {
     return author?.attributes?.name || 'Unknown Author';
   };
 
+  // 1. Reset pagination states when searchQuery query changes
   useEffect(() => {
-    // If we have a query, fetch search results
     if (searchQuery) {
-      const fetchSearch = async () => {
-        setSearchLoading(true);
-        setError(null);
-        try {
-          const res = await fetch(
-            `https://api.mangadex.org/manga?limit=24&title=${encodeURIComponent(
-              searchQuery
-            )}&includes[]=cover_art&includes[]=author&contentRating[]=safe&contentRating[]=suggestive`
-          );
-          const data = await res.json();
-          
-          const results = (data.data || []).map(m => ({
-            id: m.id,
-            title: m.attributes?.title?.en || Object.values(m.attributes?.title || {})[0] || 'Unknown Title',
-            poster: getCoverUrl(m.id, m.relationships, '512'),
-            author: getAuthorName(m.relationships),
-            rating: m.attributes?.status === 'ongoing' ? 'Ongoing' : 'Completed',
-            status: m.attributes?.status || 'N/A'
-          }));
-          
-          setSearchResults(results);
-        } catch (err) {
-          console.error(err);
-          setError('Failed to fetch manga search results. Please try again.');
-        } finally {
-          setSearchLoading(false);
-        }
-      };
-      fetchSearch();
-    } else {
-      // Fetch Home Data (Featured, Trending, Latest)
-      const fetchHomeData = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          // Select random featured ID from pool
-          const randomId = FEATURED_POOL[Math.floor(Math.random() * FEATURED_POOL.length)];
-
-          // 1. Fetch Featured Manga Info
-          const featPromise = fetch(
-            `https://api.mangadex.org/manga/${randomId}?includes[]=cover_art&includes[]=author`
-          ).then(r => r.json());
-
-          // 2. Fetch Trending Manga (popular by followedCount)
-          const trendPromise = fetch(
-            'https://api.mangadex.org/manga?limit=12&includes[]=cover_art&includes[]=author&order[followedCount]=desc&contentRating[]=safe&contentRating[]=suggestive'
-          ).then(r => r.json());
-
-          // 3. Fetch Latest Manga (recent chapter updates)
-          const latestPromise = fetch(
-            'https://api.mangadex.org/manga?limit=12&includes[]=cover_art&includes[]=author&order[latestUploadedChapter]=desc&contentRating[]=safe&contentRating[]=suggestive'
-          ).then(r => r.json());
-
-          const [featRes, trendRes, latestRes] = await Promise.all([
-            featPromise,
-            trendPromise,
-            latestPromise
-          ]);
-
-          // Set Featured
-          if (featRes.data) {
-            const m = featRes.data;
-            setFeatured({
-              id: m.id,
-              title: m.attributes?.title?.en || Object.values(m.attributes?.title || {})[0] || 'Featured Manga',
-              description: m.attributes?.description?.en?.split('\n')[0] || 'No description available.',
-              poster: getCoverUrl(m.id, m.relationships),
-              author: getAuthorName(m.relationships),
-              status: m.attributes?.status || 'ongoing',
-              demographic: m.attributes?.publicationDemographic || 'General'
-            });
-          }
-
-          // Set Trending
-          const trendingList = (trendRes.data || []).map(m => ({
-            id: m.id,
-            title: m.attributes?.title?.en || Object.values(m.attributes?.title || {})[0] || 'Manga',
-            poster: getCoverUrl(m.id, m.relationships, '512'),
-            author: getAuthorName(m.relationships),
-            status: m.attributes?.status,
-            rating: m.attributes?.state === 'published' ? '★ Popular' : null
-          }));
-          setTrending(trendingList);
-
-          // Set Latest Updates
-          const latestList = (latestRes.data || []).map(m => ({
-            id: m.id,
-            title: m.attributes?.title?.en || Object.values(m.attributes?.title || {})[0] || 'Manga',
-            poster: getCoverUrl(m.id, m.relationships, '512'),
-            author: getAuthorName(m.relationships),
-            status: m.attributes?.status,
-            rating: 'New'
-          }));
-          setLatest(latestList);
-
-        } catch (err) {
-          console.error(err);
-          setError('Failed to fetch MangaDex content. Please check your connection.');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchHomeData();
+      setPage(1);
+      setSearchResults([]);
+      setHasMore(true);
     }
+  }, [searchQuery]);
+
+  // 2. Fetch Search results with custom Pagination (Load More)
+  useEffect(() => {
+    if (!searchQuery) return;
+
+    const fetchSearch = async () => {
+      if (page === 1) {
+        setSearchLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      setError(null);
+      try {
+        const limit = 24;
+        const offset = (page - 1) * limit;
+        const res = await fetchMangaDex(
+          `manga?limit=${limit}&offset=${offset}&title=${encodeURIComponent(
+            searchQuery
+          )}&includes[]=cover_art&includes[]=author&contentRating[]=safe&contentRating[]=suggestive`
+        );
+        const data = await res.json();
+        
+        const results = (data.data || []).map(m => ({
+          id: m.id,
+          title: m.attributes?.title?.en || Object.values(m.attributes?.title || {})[0] || 'Unknown Title',
+          poster: getCoverUrl(m.id, m.relationships, '512'),
+          author: getAuthorName(m.relationships),
+          rating: m.attributes?.status === 'ongoing' ? 'Ongoing' : 'Completed',
+          status: m.attributes?.status || 'N/A'
+        }));
+        
+        if (page === 1) {
+          setSearchResults(results);
+        } else {
+          setSearchResults(prev => [...prev, ...results]);
+        }
+
+        // Determine if more items are available
+        setHasMore(data.total > offset + (data.data || []).length);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch manga search results. Please try again.');
+      } finally {
+        setSearchLoading(false);
+        setLoadingMore(false);
+      }
+    };
+
+    fetchSearch();
+  }, [searchQuery, page]);
+
+  // 3. Fetch Home Screen Categories (Featured, Trending, Latest)
+  useEffect(() => {
+    if (searchQuery) return;
+
+    const fetchHomeData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Select random featured ID from pool
+        const randomId = FEATURED_POOL[Math.floor(Math.random() * FEATURED_POOL.length)];
+
+        // 1. Fetch Featured Manga Info
+        const featPromise = fetchMangaDex(
+          `manga/${randomId}?includes[]=cover_art&includes[]=author`
+        ).then(r => r.json());
+
+        // 2. Fetch Trending Manga (popular by followedCount)
+        const trendPromise = fetchMangaDex(
+          'manga?limit=12&includes[]=cover_art&includes[]=author&order[followedCount]=desc&contentRating[]=safe&contentRating[]=suggestive'
+        ).then(r => r.json());
+
+        // 3. Fetch Latest Manga (recent chapter updates)
+        const latestPromise = fetchMangaDex(
+          'manga?limit=12&includes[]=cover_art&includes[]=author&order[latestUploadedChapter]=desc&contentRating[]=safe&contentRating[]=suggestive'
+        ).then(r => r.json());
+
+        const [featRes, trendRes, latestRes] = await Promise.all([
+          featPromise,
+          trendPromise,
+          latestPromise
+        ]);
+
+        // Set Featured
+        if (featRes.data) {
+          const m = featRes.data;
+          setFeatured({
+            id: m.id,
+            title: m.attributes?.title?.en || Object.values(m.attributes?.title || {})[0] || 'Featured Manga',
+            description: m.attributes?.description?.en?.split('\n')[0] || 'No description available.',
+            poster: getCoverUrl(m.id, m.relationships),
+            author: getAuthorName(m.relationships),
+            status: m.attributes?.status || 'ongoing',
+            demographic: m.attributes?.publicationDemographic || 'General'
+          });
+        }
+
+        // Set Trending
+        const trendingList = (trendRes.data || []).map(m => ({
+          id: m.id,
+          title: m.attributes?.title?.en || Object.values(m.attributes?.title || {})[0] || 'Manga',
+          poster: getCoverUrl(m.id, m.relationships, '512'),
+          author: getAuthorName(m.relationships),
+          status: m.attributes?.status,
+          rating: m.attributes?.state === 'published' ? '★ Popular' : null
+        }));
+        setTrending(trendingList);
+
+        // Set Latest Updates
+        const latestList = (latestRes.data || []).map(m => ({
+          id: m.id,
+          title: m.attributes?.title?.en || Object.values(m.attributes?.title || {})[0] || 'Manga',
+          poster: getCoverUrl(m.id, m.relationships, '512'),
+          author: getAuthorName(m.relationships),
+          status: m.attributes?.status,
+          rating: 'New'
+        }));
+        setLatest(latestList);
+
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch MangaDex content. Please check your connection.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchHomeData();
   }, [searchQuery]);
 
   // Display Search Results Screen
@@ -167,17 +202,32 @@ export default function Manga() {
             <Loader2 className="spinner text-primary" size={40} />
             <p className="text-muted">Searching MangaDex network...</p>
           </div>
-        ) : error ? (
+        ) : error && page === 1 ? (
           <div className="error-panel flex items-center gap-3">
             <AlertCircle className="text-red-500" />
             <span>{error}</span>
           </div>
         ) : searchResults.length > 0 ? (
-          <div className="anime-grid">
-            {searchResults.map((manga) => (
-              <MangaCard key={manga.id} manga={manga} />
-            ))}
-          </div>
+          <>
+            <div className="anime-grid">
+              {searchResults.map((manga) => (
+                <MangaCard key={manga.id} manga={manga} />
+              ))}
+            </div>
+
+            {hasMore && (
+              <div className="load-more-container flex justify-center mt-10">
+                <button 
+                  onClick={() => setPage(prev => prev + 1)}
+                  disabled={loadingMore}
+                  className="btn-load-more flex items-center gap-2"
+                >
+                  {loadingMore && <Loader2 className="spinner" size={16} />}
+                  <span>{loadingMore ? 'Loading...' : 'Load More'}</span>
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="empty-panel text-center py-16">
             <AlertCircle size={48} className="mx-auto mb-4 text-muted" />

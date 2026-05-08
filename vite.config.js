@@ -9,6 +9,11 @@ export default defineConfig({
         target: 'https://anikotoapi.site',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      '/mangadex': {
+        target: 'https://api.mangadex.org',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/mangadex/, '')
       }
     }
   }
