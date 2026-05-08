@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Play, Search, Home as HomeIcon, Compass, Heart } from 'lucide-react';
+import { Play, Search, Home as HomeIcon, Compass, Heart, Dices } from 'lucide-react';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -12,6 +12,27 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+
+  const [isRolling, setIsRolling] = useState(false);
+
+  const handleRollRandom = async () => {
+    if (isRolling) return;
+    setIsRolling(true);
+    try {
+      const res = await fetch('https://api.jikan.moe/v4/random/anime');
+      const data = await res.json();
+      if (data.data && data.data.mal_id) {
+        navigate(`/anime/mal-${data.data.mal_id}`);
+      } else {
+        alert('Failed to roll a random anime. Please try again!');
+      }
+    } catch (err) {
+      console.error('Failed to roll random anime:', err);
+      alert('Network error. Failed to roll random anime.');
+    } finally {
+      setIsRolling(false);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -75,6 +96,15 @@ export default function Navbar() {
               <Link to="/browse" className={`nav-link ${currentPath === '/browse' ? 'active' : ''}`}>Browse</Link>
               <Link to="/watchlist" className={`nav-link ${currentPath === '/watchlist' ? 'active' : ''}`}>Watchlist</Link>
             </div>
+            <button 
+              onClick={handleRollRandom} 
+              disabled={isRolling} 
+              className={`roll-random-btn ${isRolling ? 'rolling' : ''}`}
+              title="Roll Random Anime"
+            >
+              <Dices size={18} className="roll-icon" />
+              <span className="roll-text">{isRolling ? 'Rolling...' : 'Roll Random'}</span>
+            </button>
             <div className="search-container" ref={dropdownRef}>
               <form onSubmit={handleSearch} className="search-form flex items-center">
                 <input

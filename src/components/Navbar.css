@@ -263,3 +263,78 @@
     letter-spacing: 0.02em;
   }
 }
+
+/* ==========================================================================
+   Roll Random Button Styles
+   ========================================================================== */
+.roll-random-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  padding: 0.45rem 1rem;
+  border-radius: 2rem;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.roll-random-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+  transform: translateY(-1.5px);
+}
+
+.roll-random-btn:active {
+  transform: translateY(0.5px);
+}
+
+.roll-icon {
+  transition: transform 0.25s ease;
+}
+
+.roll-random-btn:hover .roll-icon {
+  transform: scale(1.15) rotate(15deg);
+}
+
+.roll-random-btn.rolling .roll-icon {
+  animation: rollDices 1s infinite linear;
+}
+
+@keyframes rollDices {
+  from {
+    transform: rotate(0deg) scale(1.15);
+  }
+  to {
+    transform: rotate(360deg) scale(1.15);
+  }
+}
+
+.roll-random-btn.rolling {
+  pointer-events: none;
+  opacity: 0.85;
+  background: rgba(139, 92, 246, 0.2);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Collapses text into circular icon on smaller layouts to save space */
+@media (max-width: 1024px) {
+  .roll-text {
+    display: none;
+  }
+  .roll-random-btn {
+    padding: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    justify-content: center;
+    border-radius: 50%;
+  }
+}
+
