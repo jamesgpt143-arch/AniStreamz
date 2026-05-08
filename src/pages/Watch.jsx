@@ -430,31 +430,14 @@ export default function Watch() {
 
       <div className="watch-content flex gap-6">
         <div className="player-section">
-          <div className="player-header flex justify-between items-center mb-4">
+          <div className="player-header mb-4">
             <h2 className="text-xl font-bold">
-              Episode {currentEpisode.number}: {currentEpisode.title}
+              Episode {currentEpisode.number}
+              {currentEpisode.title && 
+               currentEpisode.title.toLowerCase() !== `episode ${currentEpisode.number}` && 
+               currentEpisode.title.toLowerCase() !== `${currentEpisode.number}` && 
+               `: ${currentEpisode.title}`}
             </h2>
-            {nextEpisode && (
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => {
-                    setCountdown(5);
-                    setShowCountdownOverlay(true);
-                  }}
-                  className="btn-secondary autoplay-trigger flex items-center gap-2"
-                  style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
-                >
-                  ⚡ Mark Watched & Play Next
-                </button>
-                <Link 
-                  to={`/watch/${id}/${nextEpisode.episode_embed_id}`} 
-                  className="btn-primary flex items-center gap-1"
-                  style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
-                >
-                  Next Episode ➜
-                </Link>
-              </div>
-            )}
           </div>
           <div className="relative-player-container" style={{ position: 'relative' }}>
             <VideoPlayer embedUrls={currentEpisode.embed_url} />
