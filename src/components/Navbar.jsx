@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Play, Search, Home as HomeIcon, Compass, Heart } from 'lucide-react';
+import { Play, Search, Home as HomeIcon, Compass, Heart, BookOpen } from 'lucide-react';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -31,9 +31,28 @@ export default function Navbar() {
       }
       setIsSearching(true);
       try {
-        const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(searchQuery)}&limit=5`);
-        const data = await res.json();
-        setSuggestions(data.data || []);
+        if (currentPath.startsWith('/manga')) {
+          const res = await fetch(`https://api.mangadex.org/manga?limit=5&title=${encodeURIComponent(searchQuery)}&includes[]=cover_art`);
+          const data = await res.json();
+          const mapped = (data.data || []).map(manga => {
+            const coverRel = manga.relationships?.find(r => r.type === 'cover_art');
+            const fileName = coverRel?.attributes?.fileName;
+            return {
+              id: manga.id,
+              title: manga.attributes?.title?.en || Object.values(manga.attributes?.title || {})[0] || 'Unknown Title',
+              poster: fileName 
+                ? `https://uploads.mangadex.org/covers/${manga.id}/${fileName}.256.jpg`
+                : 'https://via.placeholder.com/150',
+              type: manga.attributes?.publicationDemographic || manga.attributes?.status || 'Manga',
+              isManga: true
+            };
+          });
+          setSuggestions(mapped);
+        } else {
+          const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(searchQuery)}&limit=5`);
+          const data = await res.json();
+          setSuggestions(data.data || []);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -43,22 +62,34 @@ export default function Navbar() {
 
     const debounce = setTimeout(fetchSuggestions, 500);
     return () => clearTimeout(debounce);
-  }, [searchQuery]);
+  }, [searchQuery, currentPath]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       setShowDropdown(false);
-      navigate(`/?q=${encodeURIComponent(searchQuery.trim())}`);
+      if (currentPath.startsWith('/manga')) {
+        navigate(`/manga?q=${encodeURIComponent(searchQuery.trim())}`);
+      } else {
+        navigate(`/?q=${encodeURIComponent(searchQuery.trim())}`);
+      }
     } else {
-      navigate('/');
+      if (currentPath.startsWith('/manga')) {
+        navigate('/manga');
+      } else {
+        navigate('/');
+      }
     }
   };
 
-  const handleSuggestionClick = (malId) => {
+  const handleSuggestionClick = (suggestion) => {
     setShowDropdown(false);
     setSearchQuery('');
-    navigate(`/anime/mal-${malId}`);
+    if (suggestion.isManga) {
+      navigate(`/manga/${suggestion.id}`);
+    } else {
+      navigate(`/anime/mal-${suggestion.mal_id}`);
+    }
   };
 
   return (
@@ -74,12 +105,13 @@ export default function Navbar() {
               <Link to="/" className={`nav-link ${currentPath === '/' ? 'active' : ''}`}>Home</Link>
               <Link to="/browse" className={`nav-link ${currentPath === '/browse' ? 'active' : ''}`}>Browse</Link>
               <Link to="/watchlist" className={`nav-link ${currentPath === '/watchlist' ? 'active' : ''}`}>Watchlist</Link>
+              <Link to="/manga" className={`nav-link ${currentPath.startsWith('/manga') ? 'active' : ''}`}>Manga</Link>
             </div>
             <div className="search-container" ref={dropdownRef}>
               <form onSubmit={handleSearch} className="search-form flex items-center">
                 <input
                   type="text"
-                  placeholder="Search any anime..."
+                  placeholder={currentPath.startsWith('/manga') ? "Search any manga..." : "Search any anime..."}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -98,29 +130,35 @@ export default function Navbar() {
                   {isSearching ? (
                     <div className="dropdown-item text-muted">Searching...</div>
                   ) : suggestions.length > 0 ? (
-                    suggestions.map((anime) => (
+                    suggestions.map((item) => (
                       <div 
-                        key={anime.mal_id} 
+                        key={item.id || item.mal_id} 
                         className="dropdown-item flex items-center gap-3"
-                        onClick={() => handleSuggestionClick(anime.mal_id)}
+                        onClick={() => handleSuggestionClick(item)}
                       >
                         <img 
-                          src={anime.images?.jpg?.small_image_url} 
-                          alt={anime.title} 
+                          src={item.poster || item.images?.jpg?.small_image_url} 
+                          alt={item.title} 
                           className="dropdown-img"
                         />
                         <div className="dropdown-info">
-                          <div className="dropdown-title">{anime.title}</div>
+                          <div className="dropdown-title">{item.title}</div>
                           <div className="dropdown-meta text-muted flex items-center gap-2">
-                            {anime.score && (
-                              <span className="dropdown-star">★ {anime.score}</span>
-                            )}
-                            <span>•</span>
-                            <span>{anime.type || 'TV'}</span>
-                            {anime.year && (
+                            {item.isManga ? (
+                              <span className="capitalize">{item.type}</span>
+                            ) : (
                               <>
+                                {item.score && (
+                                  <span className="dropdown-star">★ {item.score}</span>
+                                )}
                                 <span>•</span>
-                                <span>{anime.year}</span>
+                                <span>{item.type || 'TV'}</span>
+                                {item.year && (
+                                  <>
+                                    <span>•</span>
+                                    <span>{item.year}</span>
+                                  </>
+                                )}
                               </>
                             )}
                           </div>
@@ -150,6 +188,10 @@ export default function Navbar() {
         <Link to="/watchlist" className={`bottom-nav-item ${currentPath === '/watchlist' ? 'active' : ''}`}>
           <Heart size={20} />
           <span className="bottom-nav-label">Watchlist</span>
+        </Link>
+        <Link to="/manga" className={`bottom-nav-item ${currentPath.startsWith('/manga') ? 'active' : ''}`}>
+          <BookOpen size={20} />
+          <span className="bottom-nav-label">Manga</span>
         </Link>
       </div>
     </>

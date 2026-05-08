@@ -1,0 +1,182 @@
+/* Premium Immersive Manga Reader Styling */
+
+.manga-reader-container {
+  background-color: #000000;
+  min-height: 100vh;
+}
+
+/* Floating Glass Header */
+.reader-header {
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.back-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.25rem;
+  width: 2.25rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.back-circle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  transform: scale(1.05);
+}
+
+.manga-nav-title {
+  letter-spacing: 0.02em;
+}
+
+.chapter-nav-title {
+  letter-spacing: -0.01em;
+}
+
+/* Rounded Dropdown Selector */
+.chapter-dropdown-select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 0.35rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  max-width: 140px;
+  transition: all 0.2s;
+}
+
+.chapter-dropdown-select:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.chapter-dropdown-select option {
+  background: #0f172a;
+  color: white;
+}
+
+/* Pages Layout Stack */
+.reader-pages {
+  background-color: #000000;
+  width: 100%;
+}
+
+.pages-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-wrapper {
+  background-color: #000000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.manga-page-img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  background: #111;
+}
+
+.page-footer-index {
+  color: #52525b;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+/* Floating Bottom Footer Toolbar */
+.reader-footer {
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-arrow-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-arrow-btn:hover:not(.disabled) {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.nav-arrow-btn.disabled {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.01);
+  color: #3f3f46;
+  cursor: not-allowed;
+}
+
+/* Floating Quick buttons */
+.quality-badge {
+  cursor: pointer;
+}
+
+.scroll-top-btn {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.scroll-top-btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+/* Mobile responsive fine tuning */
+@media (max-width: 640px) {
+  .reader-header,
+  .reader-footer {
+    height: 3.75rem;
+  }
+
+  .chapter-nav-title {
+    font-size: 0.9rem !important;
+  }
+
+  .manga-nav-title {
+    font-size: 0.75rem !important;
+  }
+
+  .back-circle {
+    height: 2rem;
+    width: 2rem;
+  }
+
+  .chapter-dropdown-select {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    max-width: 105px;
+  }
+
+  .nav-arrow-btn {
+    padding: 0.4rem 0.75rem;
+  }
+
+  .pages-stack {
+    padding-top: 3.75rem !important;
+    padding-bottom: 3.75rem !important;
+  }
+}
