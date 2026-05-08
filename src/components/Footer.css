@@ -1,0 +1,105 @@
+.footer-section {
+  margin-top: auto;
+  padding: 3rem 0 2rem 0;
+  border-top: 1px solid var(--glass-border);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.8) 100%);
+  width: 100%;
+}
+
+.az-list-container {
+  border-radius: 1rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+}
+
+.az-header {
+  font-size: 1.1rem;
+}
+
+.az-title {
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.az-divider {
+  color: var(--glass-border);
+  font-size: 1.25rem;
+}
+
+.az-subtitle {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.az-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.az-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.375rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.az-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.footer-disclaimer {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.footer-disclaimer p {
+  font-size: 0.875rem;
+}
+
+/* Adjust layout on smaller viewports */
+@media (max-width: 768px) {
+  .footer-section {
+    padding-bottom: 8.5rem; /* Ensure bottom navigation bar doesn't overlap on mobile */
+  }
+
+  .az-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .az-divider {
+    display: none;
+  }
+
+  .az-buttons {
+    gap: 0.4rem;
+  }
+
+  .az-btn {
+    min-width: 2rem;
+    height: 2rem;
+    font-size: 0.8rem;
+  }
+}

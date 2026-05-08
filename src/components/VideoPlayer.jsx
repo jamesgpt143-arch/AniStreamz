@@ -32,12 +32,12 @@ export default function VideoPlayer({ embedUrls }) {
       </div>
       <div className="iframe-wrapper glass-panel">
         <iframe
+          key={currentUrl}
           src={currentUrl}
           allowFullScreen
           allow="autoplay; fullscreen"
           title="Video Player"
           className="video-iframe"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
         ></iframe>
       </div>
     </div>
