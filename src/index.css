@@ -118,3 +118,18 @@ h1, h2, h3, h4, h5, h6 {
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
 }
+
+/* Global Anime Grid - 3 items per row on mobile, automatic layout on desktop */
+.anime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .anime-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem; /* Smaller gaps on mobile to fit 3 columns beautifully */
+  }
+}
+
