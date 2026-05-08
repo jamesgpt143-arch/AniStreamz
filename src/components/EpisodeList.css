@@ -360,7 +360,7 @@
   .episodes-squares-grid {
     flex-grow: 1;
     min-height: 0;
-    max-height: none; /* Let flex layout dictate height on desktop */
+    max-height: 360px; /* Cap height strictly to match standard video player container */
   }
 }
 
