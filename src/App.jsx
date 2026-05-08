@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import SupportModal from './components/SupportModal';
 import Home from './pages/Home';
 import AnimeDetails from './pages/AnimeDetails';
 import Watch from './pages/Watch';
@@ -22,6 +23,7 @@ function App() {
           </Routes>
         </div>
         <Footer />
+        <SupportModal />
       </div>
     </BrowserRouter>
   );

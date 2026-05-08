@@ -264,6 +264,24 @@
   }
 }
 
+/* Navbar Support Link */
+.nav-support-link {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600 !important;
+  color: #ff5f64 !important;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.25s ease;
+}
+
+.nav-support-link:hover {
+  color: #ff474d !important;
+  text-shadow: 0 0 10px rgba(255, 95, 100, 0.45);
+}
+
 /* ==========================================================================
    Roll Random Button Styles
    ========================================================================== */

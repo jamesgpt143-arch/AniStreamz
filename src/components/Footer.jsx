@@ -21,10 +21,18 @@ export default function Footer() {
     <footer className="footer-section">
       <div className="container">
         <div className="az-list-container glass-panel p-6">
-          <div className="az-header flex items-center gap-4 mb-4">
-            <span className="az-title font-bold text-gradient">A-Z LIST</span>
-            <span className="az-divider">|</span>
-            <span className="az-subtitle text-muted">Searching order by alphabet name A to Z.</span>
+          <div className="az-header flex justify-between items-center flex-wrap gap-4 mb-4">
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="az-title font-bold text-gradient">A-Z LIST</span>
+              <span className="az-divider">|</span>
+              <span className="az-subtitle text-muted">Searching order by alphabet name A to Z.</span>
+            </div>
+            <button 
+              onClick={() => window.dispatchEvent(new Event('open-support-modal'))}
+              className="footer-support-btn"
+            >
+              💖 Support Dev
+            </button>
           </div>
           <div className="az-buttons">
             {alphabet.map((letter) => (

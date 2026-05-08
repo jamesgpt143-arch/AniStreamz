@@ -102,4 +102,39 @@
     height: 2rem;
     font-size: 0.8rem;
   }
+
+  .footer-support-btn {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+  }
 }
+
+/* Footer Support Button */
+.footer-support-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 95, 100, 0.08);
+  border: 1px solid rgba(255, 95, 100, 0.25);
+  padding: 0.45rem 1.15rem;
+  border-radius: 2rem;
+  color: #ff5f64;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.footer-support-btn:hover {
+  background: #ff5f64;
+  border-color: #ff5f64;
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 95, 100, 0.4);
+  transform: translateY(-1.5px);
+}
+
+.footer-support-btn:active {
+  transform: translateY(0.5px);
+}
+

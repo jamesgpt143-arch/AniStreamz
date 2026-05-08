@@ -95,6 +95,12 @@ export default function Navbar() {
               <Link to="/" className={`nav-link ${currentPath === '/' ? 'active' : ''}`}>Home</Link>
               <Link to="/browse" className={`nav-link ${currentPath === '/browse' ? 'active' : ''}`}>Browse</Link>
               <Link to="/watchlist" className={`nav-link ${currentPath === '/watchlist' ? 'active' : ''}`}>Watchlist</Link>
+              <button 
+                onClick={() => window.dispatchEvent(new Event('open-support-modal'))}
+                className="nav-link nav-support-link"
+              >
+                💖 Support
+              </button>
             </div>
             <button 
               onClick={handleRollRandom} 
