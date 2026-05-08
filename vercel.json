@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://anikotoapi.site/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
     }
   ]
 }
