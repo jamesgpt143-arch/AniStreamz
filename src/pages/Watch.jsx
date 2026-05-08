@@ -124,10 +124,25 @@ export default function Watch() {
               try {
                 const epRes = await fetch(`https://api.jikan.moe/v4/anime/${malId}/episodes`);
                 const epData = await epRes.json();
+                let apiEpsCount = 0;
                 if (epData.data && epData.data.length > 0) {
-                  epsCount = epData.data.length;
-                } else {
-                  epsCount = 1;
+                  apiEpsCount = epData.data.length;
+                }
+
+                let estimatedEpsCount = 1;
+                if (item.aired?.from) {
+                  const startDate = new Date(item.aired.from);
+                  const now = new Date();
+                  if (now >= startDate) {
+                    const diffMs = now.getTime() - startDate.getTime();
+                    const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000));
+                    estimatedEpsCount = diffWeeks + 1;
+                  }
+                }
+
+                epsCount = Math.max(apiEpsCount, estimatedEpsCount);
+                if (item.episodes && epsCount > item.episodes) {
+                  epsCount = item.episodes;
                 }
               } catch (e) {
                 console.error('Failed to fetch aired episodes:', e);
