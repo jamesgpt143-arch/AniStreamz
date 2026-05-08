@@ -668,3 +668,305 @@
     color: var(--text) !important;
   }
 }
+
+/* ==========================================================================
+   Split Two-Column Layout & Top Trending Sidebar
+   ========================================================================== */
+
+.main-content-split {
+  display: flex;
+  gap: 2.25rem;
+  margin-top: 1.5rem;
+  align-items: flex-start;
+}
+
+.main-content-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.main-content-right {
+  width: 350px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 5.5rem;
+  z-index: 40;
+}
+
+/* Trending Sidebar Container Box */
+.trending-sidebar-container {
+  border-radius: 1.25rem;
+  background: rgba(15, 23, 42, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Header & Filter Toggle */
+.trending-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.85rem;
+}
+
+.trending-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trophy-emoji {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 5px rgba(234, 179, 8, 0.4));
+}
+
+.trending-title-text {
+  font-size: 1.2rem;
+  color: #f1f5f9;
+  letter-spacing: -0.01em;
+}
+
+.trending-filter-wrapper {
+  position: relative;
+}
+
+.btn-trending-dropdown {
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+}
+
+.btn-trending-dropdown:hover {
+  background: var(--primary-light);
+  box-shadow: 0 6px 15px rgba(139, 92, 246, 0.45);
+}
+
+.chevron-icon {
+  font-size: 0.65rem;
+  opacity: 0.9;
+}
+
+/* Floating Dropdown Selector */
+.trending-dropdown-options {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 110px;
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  z-index: 100;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.trending-dropdown-option {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.trending-dropdown-option:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: white;
+}
+
+.trending-dropdown-option.active {
+  background: #10b981 !important; /* Premium emerald green */
+  color: white;
+}
+
+/* Trending List Item Cards */
+.trending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.trending-item-link {
+  text-decoration: none;
+}
+
+.trending-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.75rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.trending-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(139, 92, 246, 0.25);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  transform: translateX(4px);
+}
+
+/* Rank Circle Badge */
+.trending-rank {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.01);
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+/* Gradients for Top 3 Ranks */
+.rank-1 {
+  background: linear-gradient(135deg, #ffd700, #ff9f00) !important;
+  border-color: rgba(255, 215, 0, 0.5) !important;
+  color: #0f172a !important;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8) !important;
+  border-color: rgba(226, 232, 240, 0.5) !important;
+  color: #0f172a !important;
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #d97706, #78350f) !important;
+  border-color: rgba(217, 119, 6, 0.5) !important;
+  color: white !important;
+}
+
+/* Item details */
+.trending-item-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.trending-item-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 0.25rem;
+  line-height: 1.35;
+  transition: color 0.2s;
+}
+
+.trending-card:hover .trending-item-title {
+  color: #c084fc; /* soft violet hover color */
+}
+
+.trending-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.trending-meta-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.trending-meta-badge.cc {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.trending-meta-badge.sub {
+  background: rgba(234, 179, 8, 0.1);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.15);
+}
+
+.trending-meta-badge.type {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Thumbnail */
+.trending-item-img-wrapper {
+  width: 45px;
+  height: 60px;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.trending-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.trending-card:hover .trending-item-img {
+  transform: scale(1.1) rotate(1.5deg);
+}
+
+/* Sidebar Loading/Empty states */
+.loading-trending-state,
+.empty-trending-state {
+  text-align: center;
+  padding: 2.5rem 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Responsive Overrides for Sidebar Layout
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .main-content-split {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .main-content-right {
+    width: 100%;
+    position: relative;
+    top: 0;
+  }
+
+  .trending-sidebar-container {
+    padding: 1.25rem;
+    background: var(--glass-bg) !important;
+  }
+}
+

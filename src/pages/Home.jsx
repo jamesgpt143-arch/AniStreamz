@@ -91,6 +91,12 @@ export default function Home() {
   const [nowTime, setNowTime] = useState('');
   const [weekDays, setWeekDays] = useState([]);
 
+  // Top Trending Sidebar States
+  const [trendingAnimes, setTrendingAnimes] = useState([]);
+  const [trendingFilter, setTrendingFilter] = useState('NOW'); // NOW, DAY, WEEK, MONTH
+  const [loadingTrending, setLoadingTrending] = useState(false);
+  const [showTrendingDropdown, setShowTrendingDropdown] = useState(false);
+
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get('q')?.toLowerCase() || '';
 
@@ -102,6 +108,40 @@ export default function Home() {
     }, 8000);
     return () => clearInterval(slideTimer);
   }, [recentAnimes.length, query]);
+
+  // Fetch trending animes on filter changes
+  useEffect(() => {
+    if (query) return; // Don't fetch trending during active queries
+
+    setLoadingTrending(true);
+    let filterQuery = 'airing';
+    if (trendingFilter === 'NOW' || trendingFilter === 'DAY') {
+      filterQuery = 'airing';
+    } else if (trendingFilter === 'WEEK') {
+      filterQuery = 'bypopularity';
+    } else {
+      filterQuery = 'favorite';
+    }
+
+    fetch(`https://api.jikan.moe/v4/top/anime?filter=${filterQuery}&limit=10`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.data) {
+          const mapped = data.data.map((item) => ({
+            id: `mal-${item.mal_id}`,
+            title: item.title,
+            poster: item.images?.jpg?.small_image_url || item.images?.jpg?.image_url,
+            score: item.score,
+            status: item.status,
+            type: item.type,
+            episodes: item.episodes
+          }));
+          setTrendingAnimes(mapped);
+        }
+      })
+      .catch((err) => console.error('Failed to fetch trending:', err))
+      .finally(() => setLoadingTrending(false));
+  }, [trendingFilter, query]);
 
   // Fetch recent animes with pagination
   useEffect(() => {
@@ -312,43 +352,126 @@ export default function Home() {
 
 
 
-        <div className="section-header flex justify-between items-center mt-8">
-          <h2 className="section-title">
-            {query ? `Search Results for "${query}"` : 'Recent Releases'}
-          </h2>
-        </div>
-
-        {loading ? (
-          <div className="loading-state flex justify-center items-center">Loading...</div>
-        ) : error ? (
-          <div className="error-state flex justify-center items-center text-accent py-8">
-            Error: {error}
-          </div>
-        ) : displayAnimes.length > 0 ? (
-          <>
-            <div className="anime-grid">
-              {displayAnimes.map((anime) => (
-                <AnimeCard key={anime.id} anime={anime} />
-              ))}
+        <div className="main-content-split">
+          <div className="main-content-left">
+            <div className="section-header flex justify-between items-center">
+              <h2 className="section-title">
+                {query ? `Search Results for "${query}"` : 'Recent Releases'}
+              </h2>
             </div>
 
-            {!query && hasMoreRecent && (
-              <div className="load-more-container">
-                <button 
-                  onClick={() => setRecentPage((prev) => prev + 1)}
-                  disabled={loadingMoreRecent}
-                  className="btn-load-more"
-                >
-                  {loadingMoreRecent ? 'Loading...' : 'Load More'}
-                </button>
+            {loading ? (
+              <div className="loading-state flex justify-center items-center">Loading...</div>
+            ) : error ? (
+              <div className="error-state flex justify-center items-center text-accent py-8">
+                Error: {error}
+              </div>
+            ) : displayAnimes.length > 0 ? (
+              <>
+                <div className="anime-grid">
+                  {displayAnimes.map((anime) => (
+                    <AnimeCard key={anime.id} anime={anime} />
+                  ))}
+                </div>
+
+                {!query && hasMoreRecent && (
+                  <div className="load-more-container">
+                    <button 
+                      onClick={() => setRecentPage((prev) => prev + 1)}
+                      disabled={loadingMoreRecent}
+                      className="btn-load-more"
+                    >
+                      {loadingMoreRecent ? 'Loading...' : 'Load More'}
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="empty-state text-muted py-8 text-center">
+                No anime found for your search.
               </div>
             )}
-          </>
-        ) : (
-          <div className="empty-state text-muted py-8 text-center">
-            No anime found for your search.
           </div>
-        )}
+
+          {/* Top Trending Sidebar */}
+          {!query && (
+            <aside className="main-content-right">
+              <div className="trending-sidebar-container glass-panel">
+                <div className="trending-sidebar-header">
+                  <div className="trending-title-row">
+                    <span className="trophy-emoji">🏆</span>
+                    <h3 className="trending-title-text font-bold">Top Trending</h3>
+                  </div>
+                  
+                  {/* Dropdown filter selector */}
+                  <div className="trending-filter-wrapper">
+                    <button 
+                      className="btn-trending-dropdown"
+                      onClick={() => setShowTrendingDropdown(!showTrendingDropdown)}
+                    >
+                      <span>{trendingFilter}</span>
+                      <span className="chevron-icon">▼</span>
+                    </button>
+                    
+                    {showTrendingDropdown && (
+                      <div className="trending-dropdown-options glass-panel">
+                        {['NOW', 'DAY', 'WEEK', 'MONTH'].map((f) => (
+                          <div 
+                            key={f} 
+                            className={`trending-dropdown-option ${trendingFilter === f ? 'active' : ''}`}
+                            onClick={() => {
+                              setTrendingFilter(f);
+                              setShowTrendingDropdown(false);
+                            }}
+                          >
+                            {f}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="trending-list-wrapper">
+                  {loadingTrending ? (
+                    <div className="loading-trending-state">Loading trending...</div>
+                  ) : trendingAnimes.length > 0 ? (
+                    <div className="trending-list">
+                      {trendingAnimes.map((anime, index) => (
+                        <Link to={`/anime/${anime.id}`} key={anime.id} className="trending-item-link">
+                          <div className="trending-card">
+                            <div className={`trending-rank rank-${index + 1}`}>
+                              {String(index + 1).padStart(2, '0')}
+                            </div>
+                            
+                            <div className="trending-item-details">
+                              <h4 className="trending-item-title line-clamp-1">{anime.title}</h4>
+                              <div className="trending-item-meta">
+                                {anime.episodes && (
+                                  <span className="trending-meta-badge cc">CC {anime.episodes}</span>
+                                )}
+                                {anime.score && (
+                                  <span className="trending-meta-badge sub">⭐ {anime.score}</span>
+                                )}
+                                <span className="trending-meta-badge type">{anime.type || 'TV'}</span>
+                              </div>
+                            </div>
+
+                            <div className="trending-item-img-wrapper">
+                              <img src={anime.poster} alt={anime.title} className="trending-item-img" />
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-trending-state">No trending data found.</div>
+                  )}
+                </div>
+              </div>
+            </aside>
+          )}
+        </div>
 
         {/* Estimated Schedule Section */}
         {!query && (

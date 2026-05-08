@@ -105,6 +105,7 @@ export default function Watch() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
+  const [seasons, setSeasons] = useState([]);
   const [showCountdownOverlay, setShowCountdownOverlay] = useState(false);
   const [countdown, setCountdown] = useState(5);
 
@@ -177,6 +178,12 @@ export default function Watch() {
                 dub: `https://megaplay.buzz/stream/mal/${item.mal_id}/${i+1}/dub`
               }
             }));
+            setSeasons([{
+              mal_id: Number(malId),
+              name: item.title,
+              relation: 'Current',
+              isCurrent: true
+            }]);
             setData({ anime: animeObj, episodes: epsObj });
 
             // Fetch relations first, and fall back to similar genres
@@ -186,8 +193,36 @@ export default function Watch() {
               const relData = await relRes.json();
               if (relData.data && relData.data.length > 0) {
                 const eligibleRelations = [];
+                const tempSeasons = [];
                 relData.data.forEach(relGroup => {
                   const relName = relGroup.relation;
+
+                  // Parse season relations
+                  const validSeasonTypes = [
+                    'Prequel', 
+                    'Sequel', 
+                    'Alternative version', 
+                    'Alternative setting', 
+                    'Parent story',
+                    'Full story',
+                    'Spin-off',
+                    'Other'
+                  ];
+                  if (validSeasonTypes.includes(relName)) {
+                    relGroup.entry.forEach(entry => {
+                      if (entry.type === 'anime') {
+                        if (!tempSeasons.some(s => s.mal_id === entry.mal_id) && entry.mal_id !== Number(malId)) {
+                          tempSeasons.push({
+                            mal_id: entry.mal_id,
+                            name: entry.name,
+                            relation: relName,
+                            isCurrent: false
+                          });
+                        }
+                      }
+                    });
+                  }
+
                   if (relName !== 'Character' && relName !== 'Adaptation') {
                     relGroup.entry.forEach(entry => {
                       if (entry.type === 'anime') {
@@ -202,6 +237,26 @@ export default function Watch() {
                     });
                   }
                 });
+
+                // Chronological season sorting
+                const parents = tempSeasons.filter(s => s.relation === 'Parent story');
+                const prequels = tempSeasons.filter(s => s.relation === 'Prequel');
+                const sequels = tempSeasons.filter(s => s.relation === 'Sequel');
+                const others = tempSeasons.filter(s => !['Parent story', 'Prequel', 'Sequel'].includes(s.relation));
+
+                const sortedSeasons = [
+                  ...parents,
+                  ...prequels,
+                  {
+                    mal_id: Number(malId),
+                    name: item.title,
+                    relation: 'Current',
+                    isCurrent: true
+                  },
+                  ...sequels,
+                  ...others
+                ];
+                setSeasons(sortedSeasons);
 
                 if (eligibleRelations.length > 0) {
                   const relationItems = await fetchDetailsForRelations(eligibleRelations.slice(0, 4));
@@ -293,6 +348,7 @@ export default function Watch() {
             setRecommendations(finalRecommendations);
           }
         } else {
+          setSeasons([]);
           const res = await fetch(`/api/series/${id}`);
           const resData = await res.json();
           if (resData.ok) {
@@ -437,23 +493,21 @@ export default function Watch() {
   return (
     <div className="watch-page container">
       <div className="mt-4 mb-4">
-        <Link to={`/anime/${id}`} replace className="back-link flex items-center gap-2 text-muted">
+        <Link to={`/anime/${id}`} replace className="back-link flex items-center gap-2 text-muted mb-2">
           <ChevronLeft size={20} />
           <span>Back to {anime?.title}</span>
         </Link>
+        <h1 className="text-2xl font-bold mt-2">
+          Episode {currentEpisode.number}
+          {currentEpisode.title && 
+           currentEpisode.title.toLowerCase() !== `episode ${currentEpisode.number}` && 
+           currentEpisode.title.toLowerCase() !== `${currentEpisode.number}` && 
+           `: ${currentEpisode.title}`}
+        </h1>
       </div>
 
       <div className="watch-content flex gap-6">
         <div className="player-section">
-          <div className="player-header mb-4">
-            <h2 className="text-xl font-bold">
-              Episode {currentEpisode.number}
-              {currentEpisode.title && 
-               currentEpisode.title.toLowerCase() !== `episode ${currentEpisode.number}` && 
-               currentEpisode.title.toLowerCase() !== `${currentEpisode.number}` && 
-               `: ${currentEpisode.title}`}
-            </h2>
-          </div>
           <div className="relative-player-container" style={{ position: 'relative' }}>
             <VideoPlayer embedUrls={currentEpisode.embed_url} />
             
@@ -520,9 +574,13 @@ export default function Watch() {
         </div>
 
         <div className="sidebar-section">
-          <h3 className="text-xl font-bold mb-4">Up Next</h3>
           <div className="sidebar-episodes">
-            <EpisodeList episodes={episodes} animeId={id} />
+            <EpisodeList 
+              episodes={episodes} 
+              animeId={id} 
+              currentEmbedId={episode_embed_id} 
+              seasons={seasons}
+            />
           </div>
         </div>
       </div>
