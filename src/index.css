@@ -133,3 +133,14 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@media (max-width: 768px) {
+  /* Prevent the fixed bottom navigation bar from overlapping content on mobile devices */
+  .home-page,
+  .browse-page,
+  .watchlist-page,
+  .manga-page,
+  .manga-home {
+    padding-bottom: 7.5rem !important; /* Added ample padding so everything can scroll fully above the bottom bar */
+  }
+}
+
