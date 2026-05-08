@@ -1,0 +1,8 @@
+{
+  "appId": "com.anistreamz.app",
+  "appName": "AniStreamz",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
