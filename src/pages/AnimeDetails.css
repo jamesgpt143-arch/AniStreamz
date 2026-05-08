@@ -159,3 +159,91 @@
   border-color: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
 }
+
+/* Premium Mobile Media Query for Anime Info Card */
+@media (max-width: 768px) {
+  .banner {
+    height: 240px; /* Reduced banner height for mobile */
+  }
+  
+  .content-wrapper {
+    margin-top: -110px; /* Adjusted offset to match mobile banner */
+    padding: 0 1rem;
+  }
+  
+  .info-header {
+    flex-direction: column; /* Stack poster and text vertically */
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem;
+    gap: 1.25rem !important;
+  }
+  
+  .poster {
+    width: 150px; /* Sized down poster */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+  }
+  
+  .details {
+    align-items: center;
+    width: 100%;
+  }
+  
+  .details .title {
+    font-size: 1.6rem; /* Sized down title text */
+    line-height: 1.25;
+    text-align: center;
+  }
+  
+  .details .alternative-title {
+    font-size: 0.95rem;
+    text-align: center;
+    margin-top: 0.35rem;
+  }
+  
+  .meta {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem !important;
+    margin-top: 0.75rem;
+  }
+  
+  .schedule-badge {
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    line-height: 1.4;
+  }
+  
+  .description {
+    font-size: 0.85rem;
+    text-align: center;
+    line-height: 1.5;
+  }
+  
+  .genres {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.4rem !important;
+  }
+  
+  .genre-tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+  
+  .details-actions {
+    justify-content: center;
+    width: 100%;
+    gap: 0.6rem !important;
+  }
+  
+  .details-actions a,
+  .details-actions button {
+    width: 100% !important; /* Stack buttons to full-width for easy mobile tap */
+    font-size: 0.875rem;
+    padding: 0.65rem 1.25rem;
+    justify-content: center;
+  }
+}
+
