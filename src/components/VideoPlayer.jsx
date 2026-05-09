@@ -24,14 +24,14 @@ export default function VideoPlayer({ embedUrls }) {
         <h3 className="text-xl font-bold">Now Playing</h3>
         
         <div className="player-control-options flex items-center gap-4">
-          {/* Autoplay Toggle switch */}
+          {/* Auto Next Toggle switch */}
           <div className="autoplay-toggle flex items-center gap-2">
-            <span className="text-sm text-muted" style={{ fontSize: '0.875rem' }}>Autoplay</span>
+            <span className="text-sm text-muted" style={{ fontSize: '0.875rem' }}>Auto Next</span>
             <button
               className={`btn-toggle btn-autoplay ${autoplay ? 'active' : ''}`}
               onClick={toggleAutoplay}
               style={{ fontSize: '0.85rem', padding: '0.35rem 0.85rem' }}
-              title="Toggle autoplay next episode"
+              title="Toggle automatic next episode progression"
             >
               {autoplay ? 'ON' : 'OFF'}
             </button>

@@ -537,7 +537,7 @@ export default function Watch() {
             {showCountdownOverlay && nextEpisode && (
               <div className="autoplay-overlay flex flex-col justify-center items-center">
                 <div className="autoplay-card glass-panel flex flex-col items-center p-8">
-                  <h3 className="text-lg font-bold mb-2">Up Next: Episode {nextEpisode.number}</h3>
+                  <h3 className="text-lg font-bold mb-2">Auto Next Episode: Episode {nextEpisode.number}</h3>
                   <p className="text-sm text-muted mb-6">{nextEpisode.title}</p>
                   
                   {/* Circular Progress Countdown */}
@@ -599,7 +599,7 @@ export default function Watch() {
           {nextEpisode && (
             <div className="player-footer-controls flex justify-between items-center mt-4 p-4 glass-panel">
               <div className="flex flex-col">
-                <span className="text-xs text-muted uppercase tracking-wider font-bold">Up Next</span>
+                <span className="text-xs text-muted uppercase tracking-wider font-bold">Auto Next Episode</span>
                 <span className="text-sm font-semibold text-white">
                   Episode {nextEpisode.number}: {nextEpisode.title || 'Next Episode'}
                 </span>
