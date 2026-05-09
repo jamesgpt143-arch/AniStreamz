@@ -484,20 +484,74 @@ export default function Watch() {
 
   useEffect(() => {
     const handlePlayerMessage = (event) => {
+      // Log messages in developer console to help identify custom player signals
+      console.log('AniStreamz Player Message Received:', {
+        origin: event.origin,
+        data: event.data
+      });
+
       try {
-        const msg = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        const eventName = msg?.event || msg?.status || msg?.type;
-        
-        // Listen for standard ended/completed messages emitted by player iframes
-        if (['ended', 'completed', 'player_ended', 'onEnded'].includes(eventName)) {
+        const data = event.data;
+        if (!data) return;
+
+        let isEnded = false;
+
+        // 1. Check if the message is a plain string
+        if (typeof data === 'string') {
+          const lowerStr = data.toLowerCase();
+          if (
+            lowerStr === 'ended' ||
+            lowerStr === 'completed' ||
+            lowerStr === 'onended' ||
+            lowerStr === 'player_ended' ||
+            lowerStr.includes('ended') ||
+            lowerStr.includes('completed') ||
+            lowerStr.includes('plyr-ended')
+          ) {
+            isEnded = true;
+          } else {
+            // 2. Try parsing as JSON string if it looks like an object/array
+            const trimmed = data.trim();
+            if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+              try {
+                const parsed = JSON.parse(trimmed);
+                const eventName = (parsed?.event || parsed?.status || parsed?.type || parsed?.method || '') + '';
+                const lowerEvent = eventName.toLowerCase();
+                if (
+                  ['ended', 'completed', 'player_ended', 'onended', 'video_ended', 'plyr-ended'].includes(lowerEvent) ||
+                  lowerEvent.includes('ended') ||
+                  lowerEvent.includes('completed')
+                ) {
+                  isEnded = true;
+                }
+              } catch {
+                // Not valid JSON, ignore parsing
+              }
+            }
+          }
+        } 
+        // 3. Check if the message is already an object
+        else if (typeof data === 'object' && data !== null) {
+          const eventName = (data.event || data.status || data.type || data.method || '') + '';
+          const lowerEvent = eventName.toLowerCase();
+          if (
+            ['ended', 'completed', 'player_ended', 'onended', 'video_ended', 'plyr-ended'].includes(lowerEvent) ||
+            lowerEvent.includes('ended') ||
+            lowerEvent.includes('completed')
+          ) {
+            isEnded = true;
+          }
+        }
+
+        if (isEnded) {
           const autoplayEnabled = localStorage.getItem('anistreamz_autoplay') !== 'false';
           if (autoplayEnabled && nextEpisode) {
             setCountdown(5);
             setShowCountdownOverlay(true);
           }
         }
-      } catch {
-        // Safe to ignore non-JSON signals
+      } catch (err) {
+        console.error('Error handling player message:', err);
       }
     };
 
