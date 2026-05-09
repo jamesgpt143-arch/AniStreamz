@@ -482,6 +482,29 @@ export default function Watch() {
     setCountdown(5);
   }, [episode_embed_id]);
 
+  useEffect(() => {
+    const handlePlayerMessage = (event) => {
+      try {
+        const msg = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        const eventName = msg?.event || msg?.status || msg?.type;
+        
+        // Listen for standard ended/completed messages emitted by player iframes
+        if (['ended', 'completed', 'player_ended', 'onEnded'].includes(eventName)) {
+          const autoplayEnabled = localStorage.getItem('anistreamz_autoplay') !== 'false';
+          if (autoplayEnabled && nextEpisode) {
+            setCountdown(5);
+            setShowCountdownOverlay(true);
+          }
+        }
+      } catch {
+        // Safe to ignore non-JSON signals
+      }
+    };
+
+    window.addEventListener('message', handlePlayerMessage);
+    return () => window.removeEventListener('message', handlePlayerMessage);
+  }, [nextEpisode]);
+
   if (loading) {
     return <div className="container flex justify-center items-center min-h-screen">Loading...</div>;
   }
@@ -571,6 +594,37 @@ export default function Watch() {
               </div>
             )}
           </div>
+
+          {/* Premium footer controls bar */}
+          {nextEpisode && (
+            <div className="player-footer-controls flex justify-between items-center mt-4 p-4 glass-panel">
+              <div className="flex flex-col">
+                <span className="text-xs text-muted uppercase tracking-wider font-bold">Up Next</span>
+                <span className="text-sm font-semibold text-white">
+                  Episode {nextEpisode.number}: {nextEpisode.title || 'Next Episode'}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => {
+                    setCountdown(5);
+                    setShowCountdownOverlay(true);
+                  }}
+                  className="btn-secondary autoplay-trigger flex items-center gap-2"
+                  style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                >
+                  ⚡ Play Next
+                </button>
+                <Link 
+                  to={`/watch/${id}/${nextEpisode.episode_embed_id}`} 
+                  className="btn-primary flex items-center gap-1"
+                  style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                >
+                  Skip Episode ➜
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="sidebar-section">
