@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import { Bookmark, ChevronLeft, ChevronRight } from 'lucide-react';
 import AnimeCard from '../components/AnimeCard';
-import { getHistory, getWatchlist } from '../utils/storage';
+import { getHistory, getWatchlist, addToWatchlist, removeFromWatchlist } from '../utils/storage';
 import './Home.css';
 
 function getWeekDates() {
@@ -104,7 +105,7 @@ export default function Home() {
   useEffect(() => {
     if (recentAnimes.length === 0 || query) return;
     const slideTimer = setInterval(() => {
-      setActiveFeatureIndex((prev) => (prev + 1) % Math.min(5, recentAnimes.length));
+      setActiveFeatureIndex((prev) => (prev + 1) % Math.min(10, recentAnimes.length));
     }, 8000);
     return () => clearInterval(slideTimer);
   }, [recentAnimes.length, query]);
@@ -260,8 +261,41 @@ export default function Home() {
   }, [location]);
 
   const displayAnimes = query ? searchAnimes : recentAnimes;
-  const featuredList = recentAnimes.length > 0 && !query ? recentAnimes.slice(0, 5) : [];
+  const featuredList = recentAnimes.length > 0 && !query ? recentAnimes.slice(0, 10) : [];
   const featuredAnime = featuredList[activeFeatureIndex] || null;
+
+  const [watchlistUpdated, setWatchlistUpdated] = useState(0);
+  const isFeaturedBookmarked = featuredAnime ? getWatchlist().some(item => item.id === featuredAnime.id) : false;
+
+  const handleBookmarkToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!featuredAnime) return;
+    if (isFeaturedBookmarked) {
+      removeFromWatchlist(featuredAnime.id);
+    } else {
+      addToWatchlist({
+        id: featuredAnime.id,
+        title: featuredAnime.title,
+        poster: featuredAnime.poster || featuredAnime.background_image,
+        score: featuredAnime.score,
+        status: featuredAnime.status
+      });
+    }
+    setWatchlistUpdated(prev => prev + 1);
+  };
+
+  const handleNextSlide = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveFeatureIndex((prev) => (prev + 1) % featuredList.length);
+  };
+
+  const handlePrevSlide = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveFeatureIndex((prev) => (prev - 1 + featuredList.length) % featuredList.length);
+  };
 
   return (
     <div className="home-page">
@@ -281,14 +315,25 @@ export default function Home() {
           <div className="featured-overlay"></div>
           
           <div className="container featured-content pb-8">
-            {/* Genre Capsules */}
-            {featuredAnime.terms_by_type?.genre && featuredAnime.terms_by_type.genre.length > 0 && (
-              <div className="featured-genres flex gap-2 mb-4">
-                {featuredAnime.terms_by_type.genre.slice(0, 4).map((g) => (
-                  <span key={g} className="featured-genre-capsule">{g}</span>
-                ))}
-              </div>
-            )}
+            {/* Badges and meta info row */}
+            <div className="featured-badges-row flex items-center gap-2 mb-4">
+              <span className="badge-capsule badge-orange">
+                CC {featuredAnime.episodes || '??'}
+              </span>
+              {featuredAnime.rating && (
+                <span className="badge-capsule badge-green">
+                  {featuredAnime.rating.replace('PG', '').trim()}
+                </span>
+              )}
+              <span className="featured-meta-text font-bold">
+                {featuredAnime.terms_by_type?.type?.[0] || 'TV'}
+              </span>
+              {featuredAnime.terms_by_type?.genre && featuredAnime.terms_by_type.genre.length > 0 && (
+                <span className="featured-meta-text text-muted">
+                  {featuredAnime.terms_by_type.genre.slice(0, 3).join(', ')}
+                </span>
+              )}
+            </div>
             
             <h1 className="featured-title">{featuredAnime.title}</h1>
             
@@ -301,28 +346,51 @@ export default function Home() {
               </p>
             )}
 
+            {/* Premium Metadata Card Box */}
+            <div className="featured-meta-box">
+              <div className="meta-item">
+                <span className="meta-label">Rating</span>
+                <span className="meta-value">{featuredAnime.rating || 'N/A'}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">Release</span>
+                <span className="meta-value">{featuredAnime.year || '2026'}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">Quality</span>
+                <span className="meta-value">HD</span>
+              </div>
+            </div>
+
             {/* Premium CTA Button Row */}
-            <div className="featured-actions flex gap-4 mt-6">
-              <Link to={`/anime/${featuredAnime.id}`} className="featured-btn btn-watch-now flex items-center gap-2">
-                <span className="play-icon">▶</span> Watch Now
+            <div className="featured-actions flex items-center gap-4 mt-6">
+              <Link to={`/anime/${featuredAnime.id}`} className="btn-watch-now-premium">
+                WATCH NOW
               </Link>
-              <Link to={`/anime/${featuredAnime.id}`} className="featured-btn btn-details flex items-center gap-2">
-                <span className="details-icon">ⓘ</span> Details
-              </Link>
+              <button 
+                onClick={handleBookmarkToggle} 
+                className={`btn-bookmark-premium ${isFeaturedBookmarked ? 'bookmarked' : ''}`}
+                aria-label="Bookmark anime"
+              >
+                <Bookmark size={20} fill={isFeaturedBookmarked ? "#ffffff" : "none"} color="#ffffff" />
+              </button>
             </div>
           </div>
 
-          {/* Slide Indicator Dots Pagination */}
+          {/* Slide Indicator Navigation */}
           {featuredList.length > 1 && (
-            <div className="featured-dots">
-              {featuredList.map((item, idx) => (
-                <button 
-                  key={item.id} 
-                  onClick={() => setActiveFeatureIndex(idx)} 
-                  className={`featured-dot ${activeFeatureIndex === idx ? 'active' : ''}`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
+            <div className="featured-navigation">
+              <button onClick={handlePrevSlide} className="nav-arrow" aria-label="Previous slide">
+                <ChevronLeft size={20} />
+              </button>
+              <span className="nav-pagination-text">
+                <span className="current-index">{activeFeatureIndex + 1}</span>
+                <span className="divider">/</span>
+                <span className="total-slides">{featuredList.length}</span>
+              </span>
+              <button onClick={handleNextSlide} className="nav-arrow" aria-label="Next slide">
+                <ChevronRight size={20} />
+              </button>
             </div>
           )}
         </div>
