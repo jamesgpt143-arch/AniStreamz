@@ -65,6 +65,7 @@ export default function VideoPlayer({ embedUrls }) {
           allow="autoplay; fullscreen"
           title="Video Player"
           className="video-iframe"
+          sandbox="allow-scripts allow-same-origin"
         ></iframe>
       </div>
     </div>
