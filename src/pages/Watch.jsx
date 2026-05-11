@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import VideoPlayer from '../components/VideoPlayer';
 import EpisodeList from '../components/EpisodeList';
+import WatchAdGate from '../components/WatchAdGate';
 import { saveToHistory } from '../utils/storage';
 import './Watch.css';
 
@@ -586,7 +587,9 @@ export default function Watch() {
       <div className="watch-content flex gap-6">
         <div className="player-section">
           <div className="relative-player-container" style={{ position: 'relative' }}>
-            <VideoPlayer embedUrls={currentEpisode.embed_url} />
+            <WatchAdGate>
+              <VideoPlayer embedUrls={currentEpisode.embed_url} />
+            </WatchAdGate>
             
             {showCountdownOverlay && nextEpisode && (
               <div className="autoplay-overlay flex flex-col justify-center items-center">
