@@ -21,7 +21,7 @@ function App() {
             ["siteId", 747 - 27 - 138 + 666 + 5297643], // siteId = 5298144
             ["minBid", 0],
             ["popundersPerIP", "0"],
-            ["delayBetween", 0],
+            ["delayBetween", 60], // Delay in seconds between ads (60 = 1 minute)
             ["default", false],
             ["defaultPerDay", 0],
             ["topmostLayer", "auto"]
